@@ -3,7 +3,33 @@ Dapr (Distributed Application Runtime) is a runtime that helps you build resilie
 
 ![Architecture diagram](assets/architecture.png)
 
-## Running the app
+## Running locally:
+
+1. Initialize Dapr:
+
+    ```
+    dapr init
+    ```
+
+1. Build the Java packages:
+
+    ```
+    ./mvnw clean package
+    ```
+
+1. Run the Web API:
+
+    ```
+    dapr run --components-path ./webapi/components --app-id webapi --app-port 3000 -- java -jar webapi/target/webapi-0.0.1-SNAPSHOT.jar --server.port=3000
+    ```
+
+1. Run the Web App:
+
+    ```
+    dapr run --app-id webapp --app-port 8080 -- java -jar webapp/target/webapp-0.0.1-SNAPSHOT.jar --server.port=8080
+    ```
+
+## Deploy to Azure Container Apps
 
 1. [Create a private container registry using the Azure CLI](https://docs.microsoft.com/en-gb/Azure/container-registry/container-registry-get-started-azure-cli)
 

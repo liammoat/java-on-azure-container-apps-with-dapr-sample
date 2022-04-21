@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import io.dapr.client.DaprClient;
 import io.dapr.client.DaprClientBuilder;
@@ -21,6 +23,18 @@ public class WebAppApplication {
 		return Mono.fromSupplier(() -> {
 			try (DaprClient client = new DaprClientBuilder().build()) {
 				byte[] response = client.invokeMethod(SERVICE_APP_ID, "api/messages/" + key, null, HttpExtension.GET, byte[].class).block();
+				return new String(response);
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		});
+	}
+
+	@PostMapping("/api/messages/{key}")
+	public Mono<String> postMessage(@PathVariable String key, @RequestBody String message) {
+		return Mono.fromSupplier(() -> {
+			try (DaprClient client = new DaprClientBuilder().build()) {
+				byte[] response = client.invokeMethod(SERVICE_APP_ID, "api/messages/" + key, message, HttpExtension.POST, byte[].class).block();
 				return new String(response);
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
