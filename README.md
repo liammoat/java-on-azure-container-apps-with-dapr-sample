@@ -1,6 +1,8 @@
 # Java on Azure Container Apps with Dapr sample
 Dapr (Distributed Application Runtime) is a runtime that helps you build resilient stateless and stateful microservices. This repository includes a Java-based Dapr application which is deployed to Azure Container Apps via a Bicep template.
 
+![Architecture diagram](assets/architecture.png)
+
 ## Running the app
 
 1. [Create a private container registry using the Azure CLI](https://docs.microsoft.com/en-gb/Azure/container-registry/container-registry-get-started-azure-cli)
