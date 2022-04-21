@@ -12,5 +12,6 @@
 
     <modules>
         <module>webapi</module>
+        <module>webapp</module>
     </modules>
 </project>

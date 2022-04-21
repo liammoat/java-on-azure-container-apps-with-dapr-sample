@@ -29,7 +29,7 @@ public class WebApiApplication {
 
 	@GetMapping("/api/messages/{key}")
 	public Mono<String> getMessage(@PathVariable String key) {
-		return Mono.fromSupplier(() => {
+		return Mono.fromSupplier(() -> {
 			try (DaprClient client = new DaprClientBuilder().build()) {
 				client.waitForSidecar(10000).block();
 
@@ -39,14 +39,14 @@ public class WebApiApplication {
 
 				return retreivedMessage;
 			} catch (Exception ex) {
-				throw new RuntimeException(ex)
+				throw new RuntimeException(ex);
 			}
 		});
 	}
 
 	@PostMapping("/api/messages/{key}")
 	public Mono<String> postMessage(@PathVariable String key, @RequestBody String message) {
-		return Mono.fromSupplier(() => {
+		return Mono.fromSupplier(() -> {
 			try (DaprClient client = new DaprClientBuilder().build()) {
 				client.waitForSidecar(10000).block();
 
@@ -58,7 +58,7 @@ public class WebApiApplication {
 
 				return message;
 			} catch (Exception ex) {
-				throw new RuntimeException(ex)
+				throw new RuntimeException(ex);
 			}
 		});
 	}
