@@ -1,0 +1,60 @@
+name: Trigger auto deployment for webapp
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - 'webapp/**'
+    - '.github/workflows/webapp-AutoDeployTrigger-b7eb0ab9-ce0d-4d83-bf6a-0a8f85c076d1.yml'
+
+  # Allow mannually trigger 
+  workflow_dispatch:      
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to container registry
+        uses: docker/login-action@v1
+        with:
+          registry: lmdapracaacr.azurecr.io
+          username: ${{ secrets.WEBAPP_REGISTRY_USERNAME }}
+          password: ${{ secrets.WEBAPP_REGISTRY_PASSWORD }}
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: lmdapracaacr.azurecr.io/webapp:${{ github.sha }}
+          file: webapp/Dockerfile
+          context: webapp/
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.WEBAPP_AZURE_CREDENTIALS }}
+
+
+      - name: Deploy to containerapp
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az containerapp registry set -n webapp -g lm-dapr-aca-rg --server lmdapracaacr.azurecr.io --username  ${{ secrets.WEBAPP_REGISTRY_USERNAME }} --password ${{ secrets.WEBAPP_REGISTRY_PASSWORD }}
+            az containerapp update -n webapp -g lm-dapr-aca-rg --image lmdapracaacr.azurecr.io/webapp:${{ github.sha }}
